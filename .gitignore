@@ -1,0 +1,6 @@
+airflow/tmp_files/
+airflow/plugins/
+minio/
+nifi/conf/archive/
+postgres/
+sources/
