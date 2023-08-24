@@ -53,7 +53,7 @@ task3 = SparkSubmitOperator(
                                 /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
                                 /usr/local/airflow/jars/spark-excel_2.12-0.13.7.jar,\
                                 /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
-    application='/usr/local/airflow/dags/spark_scripts/censo_xlsx_to_csv.py',
+    application='/usr/local/airflow/dags/spark_scripts/extrair_csv.py',
     dag=dag
 )
 

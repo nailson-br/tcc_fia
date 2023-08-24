@@ -30,7 +30,7 @@ def convert_xlsx_to_csv(minio_file_key):
     xlsx_data = s3_client.get_object(Bucket=minio_bucket, Key=minio_file_key)['Body'].read()
 
     # Converter para DataFrame
-    df = spark.read.format("com.crealytics.spark.excel").option("header", "true").load(xlsx_data)
+    df = spark.read.format("org.apache.spark.sql.execution.datasources.xlsx").option("header", "true").load(xlsx_data)
     
     # Extrair as abas (planilhas) do arquivo xlsx
     sheets = df.select("sheet").distinct().collect()
