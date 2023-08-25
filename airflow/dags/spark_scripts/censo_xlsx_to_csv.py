@@ -15,10 +15,10 @@ minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket de origem do arquivo
 minio_bucket = config['Bucket']['bucket_name']
-source_prefix = config['Bucket']['prefix_xls']
+source_prefix = config['Bucket']['prefix_censo_xls']
 
 # Bucket de destino dos arquivos XLSX
-target_prefix = config['Bucket']['prefix_csv']
+target_prefix = config['Bucket']['prefix_censo_csv']
 
 # Inicializar a sessão Spark
 spark = (SparkSession.builder

@@ -23,8 +23,6 @@ start_dag = DummyOperator(
     dag=dag
 )
 
-
-
 task1 = SparkSubmitOperator(
     task_id='inserir_base_censo_zipada_na_raw',
     conn_id='spark_local',
@@ -37,7 +35,7 @@ task1 = SparkSubmitOperator(
 )
 
 task2 = SparkSubmitOperator(
-    task_id='extrair_xlsx_na_raw',
+    task_id='extrair_censo_xlsx_na_raw',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
@@ -48,20 +46,48 @@ task2 = SparkSubmitOperator(
 )
 
 task3 = SparkSubmitOperator(
-    task_id='extrair_csv_na_raw',
+    task_id='extrair_censo_csv_na_raw',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
                                 /usr/local/airflow/jars/spark-excel_2.12-0.13.7.jar,\
                                 /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
-    application='/usr/local/airflow/dags/spark_scripts/extrair_csv.py',
+    application='/usr/local/airflow/dags/spark_scripts/extrair_censo_csv.py',
     dag=dag
 )
 
-# task4 = SparkSubmitOperator(task_id='task4', dag=dag, application='/x.py')
-# task5 = SparkSubmitOperator(task_id='task5', dag=dag, application='/x.py')
-# task6 = SparkSubmitOperator(task_id='task6', dag=dag, application='/x.py')
+task4 = SparkSubmitOperator(
+    task_id='inserir_base_pnad_zipada_na_raw',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/extract_pnad.py',
+    dag=dag
+)
+task5 = SparkSubmitOperator(
+    task_id='extrair_pnad_xlsx_na_raw',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/pnad_unzip.py',
+    dag=dag
+)
+task6 = SparkSubmitOperator(
+    task_id='extrair_pnad_csv_na_raw',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/spark-excel_2.12-0.13.7.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/extrair_pnad_csv.py',
+    dag=dag
+)
 
 
 dag_finish = DummyOperator(
@@ -69,18 +95,7 @@ dag_finish = DummyOperator(
     dag=dag
 )
 
-start_dag >> task1 >> task2 >> task3 >> dag_finish
-
-# with DAG('ingest_data_dag', default_args=default_args, schedule_interval=None) as dag:
-#     ingest_task = SparkSubmitOperator(
-#         task_id='ingest_data_task',
-#         application="/path/to/ingestion_script.py",
-#         conf={
-#             "spark.master": "spark://spark_master:7077",
-#             "spark.submit.deployMode": "cluster"
-#         },
-#         executor_memory="2g",
-#         executor_cores=2,
-#         num_executors=1,
-#         dag=dag
-#     )
+start_dag >> [task1, task4]
+task1 >> task2 >> task3
+task4 >> task5 >> task6
+[task3, task6] >> dag_finish

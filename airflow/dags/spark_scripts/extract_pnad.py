@@ -7,7 +7,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('./config/config.ini')
 
-bases_censo = config['URL']['bases_censo']
+bases_censo = config['URL']['bases_pnad']
 
 # Defina as informações de conexão com o MinIO
 minio_access_key = config['MinIO']['access_key']
@@ -16,10 +16,10 @@ minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket onde será armazenado o arquivo zip baixado da internet
 minio_bucket = config['Bucket']['bucket_name']
-prefix = config['Bucket']['prefix_censo_zip']
+prefix = config['Bucket']['prefix_pnad_zip']
 
 # URL para download do arquivo
-zip_file_url = config['URL']['bases_censo']
+zip_file_url = config['URL']['bases_pnad']
 
 # Inicializar a sessão Spark
 spark = (SparkSession.builder
@@ -49,7 +49,7 @@ def download_url(url, chunk_size=128):
 # minio_raw_bucket = "raw"
 # minio_bucket = config["MinIO"]["bucket_zip"]
 # Nome desejado para o arquivo no MinIO
-target_file_name = config['FILE']['bases_censo_zip']
+target_file_name = config['FILE']['bases_pnad_zip']
 
 # Use a função para fazer o download
 downloaded_data = download_url(zip_file_url)

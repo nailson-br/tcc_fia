@@ -7,7 +7,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('./config/config.ini')
 
-# bases_censo = config['URL']['bases_censo']
+# bases_pnad = config['URL']['bases_pnad']
 
 # Defina as informações de conexão com o MinIO
 minio_access_key = config['MinIO']['access_key']
@@ -16,14 +16,14 @@ minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket de origem do arquivo
 minio_bucket = config['Bucket']['bucket_name']
-source_prefix = config['Bucket']['prefix_censo_zip']
+source_prefix = config['Bucket']['prefix_pnad_zip']
 
 # Bucket de destino dos arquivos XLSX
-target_prefix = config['Bucket']['prefix_censo_xls']
+target_prefix = config['Bucket']['prefix_pnad_xls']
 
 # Nome do arquivo de origem
 # ToDo - Mudar essa rotina para pegar todos os arquivos zips recursivamente
-file_name = config['FILE']['bases_censo_zip']
+file_name = config['FILE']['bases_pnad_zip']
 
 # Inicializar a sessão Spark
 spark = (SparkSession.builder

@@ -13,10 +13,10 @@ minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket de origem dos arquivos XLS
 minio_bucket = config['Bucket']['bucket_name']
-source_prefix = config['Bucket']['prefix_xls']
+source_prefix = config['Bucket']['prefix_pnad_xls']
 
 # Bucket de destino dos arquivos CSV
-target_prefix = config['Bucket']['prefix_csv']
+target_prefix = config['Bucket']['prefix_pnad_csv']
 
 # from pyspark.sql import SparkSession
 
