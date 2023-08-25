@@ -15,13 +15,15 @@ default_args = {
 dag = DAG(dag_id='dag_raw_obter_base_censo',
           default_args=default_args,
           schedule_interval='0 3 * * *',
-          tags=['RAW']
+          tags=['RAW'],
           )
 
 start_dag = DummyOperator(
     task_id='start_dag',
     dag=dag
 )
+
+
 
 task1 = SparkSubmitOperator(
     task_id='inserir_base_censo_zipada_na_raw',
@@ -56,6 +58,11 @@ task3 = SparkSubmitOperator(
     application='/usr/local/airflow/dags/spark_scripts/extrair_csv.py',
     dag=dag
 )
+
+# task4 = SparkSubmitOperator(task_id='task4', dag=dag, application='/x.py')
+# task5 = SparkSubmitOperator(task_id='task5', dag=dag, application='/x.py')
+# task6 = SparkSubmitOperator(task_id='task6', dag=dag, application='/x.py')
+
 
 dag_finish = DummyOperator(
     task_id='dag_finish',

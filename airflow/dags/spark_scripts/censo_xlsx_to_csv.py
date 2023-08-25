@@ -1,12 +1,30 @@
 from pyspark.sql import SparkSession
 import boto3
+import configparser
 import os
+
+config = configparser.ConfigParser()
+config.read('./config/config.ini')
+
+# bases_censo = config['URL']['bases_censo']
+
+# Defina as informações de conexão com o MinIO
+minio_access_key = config['MinIO']['access_key']
+minio_secret_key = config['MinIO']['secret_key']
+minio_endpoint = config['MinIO']['endpoint']
+
+# Bucket de origem do arquivo
+minio_bucket = config['Bucket']['bucket_name']
+source_prefix = config['Bucket']['prefix_xls']
+
+# Bucket de destino dos arquivos XLSX
+target_prefix = config['Bucket']['prefix_csv']
 
 # Inicializar a sessão Spark
 spark = (SparkSession.builder
-         .config("spark.hadoop.fs.s3a.endpoint", "http://minio:9000")
-         .config("spark.hadoop.fs.s3a.access.key", "aulafia")
-         .config("spark.hadoop.fs.s3a.secret.key", "aulafia@123")
+         .config("spark.hadoop.fs.s3a.endpoint", minio_endpoint)
+         .config("spark.hadoop.fs.s3a.access.key", minio_access_key)
+         .config("spark.hadoop.fs.s3a.secret.key", minio_secret_key)
          .config("spark.hadoop.fs.s3a.path.style.access", "true")
          .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
          .config("spark.hadoop.fs.s3a.aws.credentials.provider", "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider")
@@ -14,11 +32,6 @@ spark = (SparkSession.builder
          .getOrCreate()
          )
 
-# Defina as informações de conexão com o MinIO
-minio_access_key = 'aulafia'
-minio_secret_key = 'aulafia@123'
-minio_endpoint = 'http://minio:9000'
-minio_bucket = 'raw'
 
 # Função para ler arquivos xlsx e gerar arquivos csv
 def convert_xlsx_to_csv(minio_file_key):
@@ -46,7 +59,7 @@ def convert_xlsx_to_csv(minio_file_key):
 
         # Gravar o DataFrame filtrado como arquivo CSV no mesmo bucket
         csv_data = filtered_df.toPandas().to_csv(index=False)
-        s3_client.put_object(Bucket=minio_bucket, Key=csv_filename, Body=csv_data)
+        s3_client.put_object(Bucket=minio_bucket, Key=target_prefix+csv_filename, Body=csv_data)
 
         print(f"Arquivo CSV {csv_filename} gerado e enviado ao MinIO com sucesso!")
 
@@ -54,7 +67,7 @@ def convert_xlsx_to_csv(minio_file_key):
 s3_client = boto3.client('s3', endpoint_url=minio_endpoint,
                          aws_access_key_id=minio_access_key,
                          aws_secret_access_key=minio_secret_key)
-bucket_objects = s3_client.list_objects(Bucket=minio_bucket)['Contents']
+bucket_objects = s3_client.list_objects(Bucket=minio_bucket, Prefix=source_prefix)['Contents']
 
 # Filtrar arquivos xlsx e gerar arquivos CSV para cada aba
 for obj in bucket_objects:

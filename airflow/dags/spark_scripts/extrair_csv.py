@@ -1,5 +1,22 @@
 import pandas as pd
 import boto3
+import configparser
+import os
+
+config = configparser.ConfigParser()
+config.read('./config/config.ini')
+
+# Defina as informações de conexão com o MinIO
+minio_access_key = config['MinIO']['access_key']
+minio_secret_key = config['MinIO']['secret_key']
+minio_endpoint = config['MinIO']['endpoint']
+
+# Bucket de origem dos arquivos XLS
+minio_bucket = config['Bucket']['bucket_name']
+source_prefix = config['Bucket']['prefix_xls']
+
+# Bucket de destino dos arquivos CSV
+target_prefix = config['Bucket']['prefix_csv']
 
 # from pyspark.sql import SparkSession
 
@@ -15,90 +32,34 @@ import boto3
 
 
 # Defina as informações de conexão com o MinIO
-minio_access_key = 'aulafia'
-minio_secret_key = 'aulafia@123'
-minio_endpoint = 'http://minio:9000'
-minio_bucket = 'raw'
-
-print("")
-print("")
-print("")
-print("INICIANDO SESSÃO SPARK")
-print("")
-print("")
-print("")
+minio_access_key = minio_access_key
+minio_secret_key = minio_secret_key
+minio_endpoint = minio_endpoint
+# minio_bucket = 'raw'
 
 # Crie uma sessão do boto3 para acessar o MinIO
 s3_client = boto3.client('s3', endpoint_url=minio_endpoint,
                          aws_access_key_id=minio_access_key,
                          aws_secret_access_key=minio_secret_key)
 
-
-print("")
-print("")
-print("")
-print("LISTANDO OBJETOS NO BUCKET")
-print("")
-print("")
-print("")
 # Listar os objetos no bucket "raw"
-bucket_objects = s3_client.list_objects(Bucket=minio_bucket)['Contents']
+bucket_objects = s3_client.list_objects(Bucket=minio_bucket, Prefix=source_prefix)['Contents']
 
-print("")
-print("")
-print("")
-print("ITERANDO NOS OBJETOS")
-print("")
-print("")
-print("")
 # Iterar sobre os objetos e encontrar arquivos XLSX ou XLS
 for obj in bucket_objects:
     file_key = obj['Key']
     if file_key.lower().endswith('.xlsx') or file_key.lower().endswith('.xls'):
-        print("")
-        print("")
-        print("")
-        print("CARREGANDO OS ARQUIVOS USANDO PANDAS")
-        print("")
-        print("")
-        print("")
         # Carregar o arquivo XLSX usando pandas
-        print("")
-        print("")
-        print("")
-        print("ARQUIVO:")
-        print(file_key)
-        print("")
-        print("")
         xlsx_data = s3_client.get_object(Bucket=minio_bucket, Key=file_key)['Body'].read()
-        print("")
-        print("")
-        print("")
-        print("ABRINDO O EXCEL >>>>>>>>>>>>>>>>>>>>>>>>>>>")
-        print("")
-        print("")
-        print("")
         xls_df = pd.read_excel(xlsx_data, sheet_name=None)  # None carrega todas as abas
-        
-        print("")
-        print("")
-        print("")
-        print("SALVANDO ABAS")
-        print("")
-        print("")
-        print("")
         # Salvar cada aba como um arquivo CSV no bucket "raw"
         for sheet_name, sheet_data in xls_df.items():
-            csv_filename = f"{file_key}-{sheet_name}.csv"
+            # A linha abaixo estava adicionando a estrutura
+            # de origem do bucket
+            # csv_filename = f"{file_key}-{sheet_name}.csv"
+            # Linha corrigida
+            csv_filename = f"{os.path.splitext(os.path.basename(file_key))[0]}-{sheet_name}.csv"
             csv_data = sheet_data.to_csv(index=False)
-               
-            print("")
-            print("")
-            print("")
-            print("ENVIANDO PARA O BUCKET")
-            print("")
-            print("")
-            print("")
             # Enviar o arquivo CSV de volta para o MinIO
-            s3_client.put_object(Bucket=minio_bucket, Key=csv_filename, Body=csv_data.encode())
+            s3_client.put_object(Bucket=minio_bucket, Key=target_prefix+csv_filename, Body=csv_data.encode())
             print(f"Arquivo CSV {csv_filename} gerado e enviado ao MinIO com sucesso!")
