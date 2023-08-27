@@ -15,7 +15,7 @@ minio_secret_key = config['MinIO']['secret_key']
 minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket de origem do arquivo
-minio_bucket = config['Bucket']['bucket_name']
+minio_bucket = config['Bucket']['bucket_raw']
 source_prefix = config['Bucket']['prefix_censo_zip']
 
 # Bucket de destino dos arquivos XLSX

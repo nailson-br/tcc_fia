@@ -42,6 +42,22 @@ services:
         - POSTGRES_DB=db_aulafia
         - PGDATA=/var/lib/postgresql/data
 
+    mysql:  # Adicionando o serviço MySQL
+      image: mysql:latest
+      container_name: mysql
+      restart: unless-stopped
+      volumes:
+        - ./mysql/data:/var/lib/mysql
+      networks:
+        - net
+      ports:
+        - 3306:3306
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        # - MYSQL_USER=user  # Adicionei o nome de usuário aqui
+        # - MYSQL_PASSWORD=user  # Adicionei a senha do usuário aqui
+        - MYSQL_DATABASE=db_aulafia
+
     airflow:
       image: ferrettivinicius/airflow-aula-fia:latest
       hostname: airflow
@@ -59,19 +75,19 @@ services:
       ports:
           - 8081:8080
 
-    nifi:
-      image: apache/nifi:1.15.3
-      restart: always
-      hostname: nifi
-      container_name: nifi
-      ports:
-        - 8080:8080
-      environment:
-        - NIFI_WEB_HTTP_PORT=8080
-      networks:
-        - net
-      volumes:
-        - ./nifi/conf:/opt/nifi/nifi-current/conf
+    # nifi:
+    #   image: apache/nifi:1.15.3
+    #   restart: always
+    #   hostname: nifi
+    #   container_name: nifi
+    #   ports:
+    #     - 8080:8080
+    #   environment:
+    #     - NIFI_WEB_HTTP_PORT=8080
+    #   networks:
+    #     - net
+    #   volumes:
+    #     - ./nifi/conf:/opt/nifi/nifi-current/conf
 
     # jupyter:
     #   image: jupyter/pyspark-notebook:spark-3.2.1

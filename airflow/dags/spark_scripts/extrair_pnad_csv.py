@@ -12,7 +12,7 @@ minio_secret_key = config['MinIO']['secret_key']
 minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket de origem dos arquivos XLS
-minio_bucket = config['Bucket']['bucket_name']
+minio_bucket = config['Bucket']['bucket_raw']
 source_prefix = config['Bucket']['prefix_pnad_xls']
 
 # Bucket de destino dos arquivos CSV

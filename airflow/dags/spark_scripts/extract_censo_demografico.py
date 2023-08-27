@@ -15,7 +15,7 @@ minio_secret_key = config['MinIO']['secret_key']
 minio_endpoint = config['MinIO']['endpoint']
 
 # Bucket onde será armazenado o arquivo zip baixado da internet
-minio_bucket = config['Bucket']['bucket_name']
+minio_bucket = config['Bucket']['bucket_raw']
 prefix = config['Bucket']['prefix_censo_zip']
 
 # URL para download do arquivo
