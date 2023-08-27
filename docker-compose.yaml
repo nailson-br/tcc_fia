@@ -89,14 +89,14 @@ services:
     #   volumes:
     #     - ./nifi/conf:/opt/nifi/nifi-current/conf
 
-    # jupyter:
-    #   image: jupyter/pyspark-notebook:spark-3.2.1
-    #   hostname: jupyter
-    #   container_name: jupyter
-    #   ports:
-    #     - 8888:8888
-    #   networks:
-    #     - net
-    #   volumes:
-    #     - ./jupyter/notebooks:/home/jovyan/notebooks
-    #     - ./jupyter/jars:/home/jovyan/jars
+    jupyter:
+      image: jupyter/pyspark-notebook:spark-3.2.1
+      hostname: jupyter
+      container_name: jupyter
+      ports:
+        - 8888:8888
+      networks:
+        - net
+      volumes:
+        - ./jupyter/notebooks:/home/jovyan/notebooks
+        - ./jupyter/jars:/home/jovyan/jars
