@@ -100,3 +100,5 @@ services:
       volumes:
         - ./jupyter/notebooks:/home/jovyan/notebooks
         - ./jupyter/jars:/home/jovyan/jars
+        - ./jupyter/sandbox:/home/jovyan/sandbox
+        - ./jupyter/config:/home/jovyan/config
