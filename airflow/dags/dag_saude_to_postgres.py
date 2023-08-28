@@ -12,7 +12,7 @@ default_args = {
     'start_date': datetime(2023, 8, 20)
 }
 
-dag = DAG(dag_id='dag_trust_saude',
+dag = DAG(dag_id='dag_dados_saude_para_postgres',
           default_args=default_args,
           schedule_interval='0 3 * * *',
           tags=['TRUST'],
@@ -24,13 +24,24 @@ start_dag = DummyOperator(
 )
 
 task1 = SparkSubmitOperator(
-    task_id='trust_insere_dados_saude',
+    task_id='saude_to_postgre',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
                                 /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
-    application='/usr/local/airflow/dags/spark_scripts/trust_censo_saude.py',
+    application='/usr/local/airflow/dags/spark_scripts/saude_to_postgres.py',
+    dag=dag
+)
+
+task2 = SparkSubmitOperator(
+    task_id='coordenadas_to_postgre',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/coordenadas_to_postgres.py',
     dag=dag
 )
 
@@ -39,4 +50,4 @@ dag_finish = DummyOperator(
     dag=dag
 )
 
-start_dag >> task1 >> dag_finish
+start_dag >> [task1, task2] >> dag_finish
