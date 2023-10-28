@@ -14,8 +14,8 @@ access_key = config.get("MinIO", "access_key")
 secret_key = config.get("MinIO", "secret_key")
 bucket_raw = config.get("Bucket", "bucket_raw")
 bucket_context = config.get("Bucket", "bucket_context")
-prefix_coordenadas_json = config.get("Bucket", "prefix_coordenadas_json") # Prefixo do arquivo CSV na raw
-prefix_coordenadas_csv = config.get("Bucket", "prefix_coordenadas_csv") # Prefixo do arquivo somente com as informações de saúde que vai para a context
+prefix_coordenadas_municipios_json = config.get("Bucket", "prefix_coordenadas_municipios_json") # Prefixo do arquivo CSV na raw
+prefix_coordenadas_municipios_csv = config.get("Bucket", "prefix_coordenadas_municipios_csv") # Prefixo do arquivo somente com as informações de saúde que vai para a context
 
 # Nome do arquivo a ser lido
 source_filename = config.get("FILE", "coordenadas_municipios_json")
@@ -30,7 +30,7 @@ minio_client = boto3.client("s3",
 
 # Obter o objeto do arquivo do bucket de origem
 response = minio_client.get_object(Bucket=bucket_raw,
-                                   Key=prefix_coordenadas_json + 
+                                   Key=prefix_coordenadas_municipios_json + 
                                    source_filename)
 json_content = response['Body'].read()
 

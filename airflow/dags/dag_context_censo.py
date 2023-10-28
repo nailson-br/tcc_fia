@@ -35,13 +35,24 @@ task1 = SparkSubmitOperator(
 )
 
 task2 = SparkSubmitOperator(
-    task_id='context_coordenadas',
+    task_id='context_coordenadas_municipios',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
                                 /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
-    application='/usr/local/airflow/dags/spark_scripts/context_coordenadas.py',
+    application='/usr/local/airflow/dags/spark_scripts/context_coordenadas_municipios.py',
+    dag=dag
+)
+
+task3 = SparkSubmitOperator(
+    task_id='context_coordenadas_estados',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/context_coordenadas_estados.py',
     dag=dag
 )
 
@@ -50,4 +61,4 @@ dag_finish = DummyOperator(
     dag=dag
 )
 
-start_dag >> [task1, task2] >> dag_finish
+start_dag >> [task1, task2, task3] >> dag_finish

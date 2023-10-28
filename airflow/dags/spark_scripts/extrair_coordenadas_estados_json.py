@@ -12,10 +12,10 @@ config = ConfigParser()
 config.read("./config/config.ini")
 
 # Caminho para download dos dados
-url_coordenadas_municipios = config.get('URL', 'coordenadas_municipios_ibge')
+url_coordenadas_estados = config.get('URL', 'coordenadas_estados_ibge')
 
 # Fazer a requisição para obter o JSON da URL
-response = requests.get(url_coordenadas_municipios)
+response = requests.get(url_coordenadas_estados)
 
 # Decodificar o conteúdo da resposta removendo o BOM
 content = response.content.decode('utf-8-sig')
@@ -29,7 +29,7 @@ endpoint = config.get("MinIO", "endpoint")
 access_key = config.get("MinIO", "access_key")
 secret_key = config.get("MinIO", "secret_key")
 bucket_raw = config.get("Bucket", "bucket_raw")
-prefix_coordenadas_municipios_json = config.get("Bucket", "prefix_coordenadas_municipios_json")
+prefix_coordenadas_estados_json = config.get("Bucket", "prefix_coordenadas_estados_json")
 
 # Inicializar o cliente boto3 para S3
 minio_client = boto3.client("s3", 
@@ -39,12 +39,12 @@ minio_client = boto3.client("s3",
 )
 
 # Nome e caminho com o qual o arquivo será gravado
-json_filename = config.get('FILE', 'coordenadas_municipios_json')
-json_s3_path = f"{prefix_coordenadas_municipios_json}{json_filename}"
+json_filename = config.get('FILE', 'coordenadas_estados_json')
+json_s3_path = f"{prefix_coordenadas_estados_json}{json_filename}"
 
 # Armazenar o JSON no bucket 'raw'
 minio_client.put_object(Bucket=bucket_raw,
-                        Key=prefix_coordenadas_municipios_json + 
+                        Key=prefix_coordenadas_estados_json + 
                         json_filename, 
                         Body=response.content)
 

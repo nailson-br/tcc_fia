@@ -113,12 +113,24 @@ task8 = SparkSubmitOperator(
     dag=dag
 )
 
+task9 = SparkSubmitOperator(
+    task_id='extrair_coordenadas_estados',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/spark-excel_2.12-0.13.7.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/extrair_coordenadas_estados_json.py',
+    dag=dag
+)
+
 dag_finish = DummyOperator(
     task_id='dag_finish',
     dag=dag
 )
 
-start_dag >> [task1, task4, task7, task8]
+start_dag >> [task1, task4, task7, task8, task9]
 task1 >> task2 >> task3
 task4 >> task5 >> task6
-[task3, task6, task7, task8] >> dag_finish
+[task3, task6, task7, task8, task9] >> dag_finish

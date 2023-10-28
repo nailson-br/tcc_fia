@@ -34,9 +34,20 @@ task1 = SparkSubmitOperator(
     dag=dag
 )
 
+task2 = SparkSubmitOperator(
+    task_id='trust_insere_dados_completos',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/trust_censo_completo.py',
+    dag=dag
+)
+
 dag_finish = DummyOperator(
     task_id='dag_finish',
     dag=dag
 )
 
-start_dag >> task1 >> dag_finish
+start_dag >> [task1, task2] >> dag_finish

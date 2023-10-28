@@ -26,7 +26,7 @@ secret_key = config.get("MinIO", "secret_key")
 bucket_raw = config.get("Bucket", "bucket_raw")
 bucket_context = config.get("Bucket", "bucket_context")
 prefix_municipios_ibge_json = config.get("Bucket", "prefix_municipios_ibge_json")
-prefix_municipios_ibge_csv = config.get("Bucket", "prefix_municipios_ibge_csv")
+# prefix_municipios_ibge_csv = config.get("Bucket", "prefix_municipios_ibge_csv") # Não está sendo utilizado
 
 # Inicializar o cliente boto3 para S3
 s3_client = boto3.client(
@@ -37,7 +37,7 @@ s3_client = boto3.client(
 )
 
 # Armazenar o JSON no bucket 'raw'
-json_filename = "MunicipiosIBGE.json"
+json_filename = config.get("FILE", "municipios_ibge_json")
 json_s3_path = f"{prefix_municipios_ibge_json}{json_filename}"
 
 s3_client.put_object(Bucket=bucket_raw,
