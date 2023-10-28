@@ -5,3 +5,4 @@ nifi/conf/archive/
 postgres/
 sources/
 mysql/
+fontes_apenas_planejamento/
