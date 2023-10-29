@@ -12,7 +12,7 @@ default_args = {
     'start_date': datetime(2023, 8, 20)
 }
 
-dag = DAG(dag_id='dag_dados_saude_para_postgres',
+dag = DAG(dag_id='04_dag_dados_completos_para_postgres',
           default_args=default_args,
           schedule_interval='0 3 * * *',
           tags=['TRUST'],
@@ -24,7 +24,7 @@ start_dag = DummyOperator(
 )
 
 task1 = SparkSubmitOperator(
-    task_id='saude_to_postgre',
+    task_id='censo_saude_to_postgre',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
@@ -35,13 +35,40 @@ task1 = SparkSubmitOperator(
 )
 
 task2 = SparkSubmitOperator(
-    task_id='coordenadas_to_postgre',
+    task_id='censo_completo_to_postgre',
     conn_id='spark_local',
     jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
                                 /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
                                 /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
-    application='/usr/local/airflow/dags/spark_scripts/coordenadas_to_postgres.py',
+    application='/usr/local/airflow/dags/spark_scripts/censo_completo_to_postgres.py',
+    dag=dag
+)
+
+task3 = SparkSubmitOperator(
+    task_id='coordenadas_municipios_to_postgre',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/coordenadas_municipios_to_postgres.py',
+    dag=dag
+)
+
+task4 = SparkSubmitOperator(
+    task_id='coordenadas_estados_to_postgre',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/coordenadas_estados_to_postgres.py',
+    dag=dag
+)
+
+dag_tasks_join = DummyOperator(
+    task_id='dag_tasks_join',
     dag=dag
 )
 
@@ -50,4 +77,4 @@ dag_finish = DummyOperator(
     dag=dag
 )
 
-start_dag >> [task1, task2] >> dag_finish
+start_dag >> [task3, task4] >> dag_tasks_join >> [task1, task2] >> dag_finish

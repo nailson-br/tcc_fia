@@ -12,7 +12,7 @@ default_args = {
     'start_date': datetime(2023, 8, 20)
 }
 
-dag = DAG(dag_id='dag_trust_saude',
+dag = DAG(dag_id='03_dag_trust_saude',
           default_args=default_args,
           schedule_interval='0 3 * * *',
           tags=['TRUST'],
@@ -45,9 +45,20 @@ task2 = SparkSubmitOperator(
     dag=dag
 )
 
+task3 = SparkSubmitOperator(
+    task_id='trust_insere_indicadores',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/trust_censo_indicadores.py',
+    dag=dag
+)
+
 dag_finish = DummyOperator(
     task_id='dag_finish',
     dag=dag
 )
 
-start_dag >> [task1, task2] >> dag_finish
+start_dag >> [task1, task2, task3] >> dag_finish

@@ -15,7 +15,7 @@ secret_key = config.get("MinIO", "secret_key")
 bucket_context = config.get("Bucket", "bucket_context")
 
 # Nome do arquivo a ser lido
-source_filename = config.get("FILE", "coordenadas_municipios_csv")
+source_filename = config.get("FILE", "coordenadas_estados_csv")
 
 # Configurar as credenciais do PostgreSQL
 postgres_host = config.get("POSTGRESQL", "host_name")
@@ -48,37 +48,34 @@ postgres_connection = psycopg2.connect(
 )
 
 try:
-    # Apagar a tabela coordenadas (se existir)
+    # Apagar a tabela coordenadas_estados (se existir)
     with postgres_connection.cursor() as cursor:
-        cursor.execute("DROP TABLE IF EXISTS coordenadas")
+        cursor.execute("DROP TABLE IF EXISTS coordenadas_estados")
 
     # Criar novamente a tabela coordenadas
     with postgres_connection.cursor() as cursor:
         cursor.execute("""
-            CREATE TABLE coordenadas (
-                codigo_ibge VARCHAR(100),
-                nome VARCHAR(100),
+            CREATE TABLE coordenadas_estados (
+                codigo_uf VARCHAR(10),
+                uf VARCHAR(10),
+                nome VARCHAR(20),
                 latitude VARCHAR(20),
                 longitude VARCHAR(20),
-                capital VARCHAR(4),
-                codigo_uf VARCHAR(4),
-                siafi_id VARCHAR(4),
-                ddd VARCHAR(4),
-                fuso_horario VARCHAR(32)
+                regiao VARCHAR(20)
             )
         """)
     postgres_connection.commit()
 
-    # Inserir os dados na tabela coordenadas
+    # Inserir os dados na tabela coordenadas_estados
     with postgres_connection.cursor() as cursor:
         for index, row in data_frame.iterrows():
-            sql = "INSERT INTO coordenadas VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            values = (row['codigo_ibge'], row['nome'], row['latitude'], row['longitude'],
-                      row['capital'], row['codigo_uf'], row['siafi_id'], row['ddd'], row['fuso_horario'])
+            sql = "INSERT INTO coordenadas_estados VALUES (%s, %s, %s, %s, %s, %s)"
+            values = (row['codigo_uf'], row['uf'], row['nome'], row['latitude'],
+                      row['longitude'], row['regiao'])
             cursor.execute(sql, values)
         postgres_connection.commit()
 
-    print(f'Dados do arquivo {source_filename} inseridos na tabela coordenadas com sucesso.')
+    print(f'Dados do arquivo {source_filename} inseridos na tabela coordenadas_estados com sucesso.')
 
 finally:
     postgres_connection.close()

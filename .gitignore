@@ -1,5 +1,6 @@
 airflow/tmp_files/
 airflow/plugins/
+airflow/dags/__pycache__/
 minio/
 nifi/conf/archive/
 postgres/
