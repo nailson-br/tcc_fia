@@ -38,7 +38,7 @@ data_frame = pd.read_csv(io.BytesIO(csv_content))
 output_buffer = io.StringIO()
 
 # Salvar o DataFrame reduzido como um arquivo CSV no buffer
-selected_columns.to_csv(output_buffer, index=False, encoding='utf-8')
+data_frame.to_csv(output_buffer, index=False, encoding='utf-8')
 
 # Obter o conteúdo do buffer como bytes codificados em UTF-8
 encoded_csv_content = output_buffer.getvalue().encode('utf-8')

@@ -67,6 +67,17 @@ task4 = SparkSubmitOperator(
     dag=dag
 )
 
+task5 = SparkSubmitOperator(
+    task_id='censo_indicadores_to_postgre',
+    conn_id='spark_local',
+    jars='/usr/local/airflow/jars/aws-java-sdk-dynamodb-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-core-1.11.534.jar,\
+                                /usr/local/airflow/jars/aws-java-sdk-s3-1.11.534.jar,\
+                                /usr/local/airflow/jars/hadoop-aws-3.2.2.jar'.replace(' ', ''),
+    application='/usr/local/airflow/dags/spark_scripts/censo_indicadores_to_postgres.py',
+    dag=dag
+)
+
 dag_tasks_join = DummyOperator(
     task_id='dag_tasks_join',
     dag=dag
@@ -77,4 +88,4 @@ dag_finish = DummyOperator(
     dag=dag
 )
 
-start_dag >> [task3, task4] >> dag_tasks_join >> [task1, task2] >> dag_finish
+start_dag >> [task3, task4] >> dag_tasks_join >> [task1, task2, task5] >> dag_finish
